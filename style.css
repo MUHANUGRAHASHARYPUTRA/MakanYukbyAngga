@@ -1,0 +1,335 @@
+/* === Global Reset === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f6f9fc;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  /* === Navbar === */
+  .navbar {
+    background: #ff4d4d;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+  
+  .navbar .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .navbar button {
+    background: #fff;
+    color: #ff4d4d;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .navbar button:hover {
+    background: #ffe6e6;
+  }
+  
+  /* === Login/Register Form === */
+  .container {
+    max-width: 400px;
+    margin: 3rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    animation: fadeIn 1s ease;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  form button {
+    background: #ff4d4d;
+    color: white;
+    padding: 10px;
+    border: none;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  form button:hover {
+    background: #e60000;
+  }
+  
+  .toggle-form {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .toggle-form span {
+    cursor: pointer;
+    padding: 5px 10px;
+  }
+  .toggle-form .active {
+    color: #ff4d4d;
+    font-weight: bold;
+  }
+  
+  #form-message {
+    color: red;
+    text-align: center;
+  }
+  
+  /* === Menu Page === */
+  .menu-header, .admin-header, .checkout-section {
+    text-align: center;
+    margin: 2rem auto 1rem;
+    padding: 1rem;
+  }
+  
+  .menu-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 2rem;
+  }
+  
+  .menu-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  .menu-card:hover {
+    transform: translateY(-5px);
+  }
+  .menu-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .menu-card h3 {
+    margin-top: 0.5rem;
+  }
+  .menu-card button {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    margin-top: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .menu-card button:hover {
+    background: #e60000;
+  }
+  
+  /* === Footer Checkout === */
+  .cart-footer {
+    text-align: center;
+    margin: 2rem 0;
+  }
+  .cart-footer button {
+    background: #009966;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .cart-footer button:hover {
+    background: #007752;
+  }
+  
+  /* === Admin Page === */
+  .order-list {
+    padding: 2rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .order-card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 6px solid #ff4d4d;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  .order-card ul {
+    margin: 0.5rem 0;
+    padding-left: 1.2rem;
+  }
+  .order-card .proof-img {
+    margin-top: 0.5rem;
+    width: 200px;
+    height: auto;
+    border-radius: 6px;
+  }
+  
+  /* === Checkout Page === */
+  .checkout-section form {
+    max-width: 500px;
+    margin: auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .checkout-section h1 {
+    margin-bottom: 1rem;
+  }
+  .checkout-section label,
+  .checkout-section select,
+  .checkout-section input {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .checkout-section input[type="radio"] {
+    display: inline-block;
+    width: auto;
+    margin-right: 8px;
+  }
+  .bank-info {
+    font-size: 14px;
+    color: #555;
+  }
+  #checkout-message {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  /* === Utilities === */
+  .hidden {
+    display: none;
+  }
+  
+  /* === Animasi === */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* === Login / Register Page New Layout === */
+.login-body {
+    background: linear-gradient(135deg, #ff4d4d, #ff9966);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    display: flex;
+    background: #fff;
+    width: 900px;
+    max-width: 95%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .login-left, .login-right {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .login-left {
+    background: #ffece6;
+    text-align: center;
+  }
+  
+  .login-left h1 {
+    font-size: 24px;
+    color: #cc0000;
+  }
+  
+  .login-left p {
+    margin-top: 0.5rem;
+    font-size: 16px;
+  }
+  
+  .login-left img {
+    max-width: 80%;
+    margin-top: 1rem;
+  }
+  
+  .login-right form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .login-right input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .login-right button {
+    background: #ff4d4d;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .login-right button:hover {
+    background: #e60000;
+  }
+  
+  .form-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .form-toggle .active {
+    color: #ff4d4d;
+    border-bottom: 2px solid #ff4d4d;
+  }
+  
+  #form-message {
+    text-align: center;
+    margin-top: 1rem;
+    color: red;
+  }
+  

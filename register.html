@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Akun - MakanYuk</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body class="auth-page">
+
+  <div class="auth-container">
+    <h2>Buat Akun Baru</h2>
+    <form id="registerForm" class="auth-form">
+      <input type="text" id="name" placeholder="Nama Lengkap" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Kata Sandi" required />
+      <button type="submit" class="btn">Daftar</button>
+      <p class="text-center">Sudah punya akun? <a href="index.html">Login di sini</a></p>
+      <p id="register-error" class="error-message"></p>
+    </form>
+  </div>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZvhSeKEvHTAPLm6twBoDcmeUnJpOL6gE",
+      authDomain: "makanyuk-83efd.firebaseapp.com",
+      projectId: "makanyuk-83efd",
+      storageBucket: "makanyuk-83efd.appspot.com",
+      messagingSenderId: "855674928287",
+      appId: "1:855674928287:web:d1a61ac04911c7c1ba76aa"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const registerForm = document.getElementById("registerForm");
+    const errorEl = document.getElementById("register-error");
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Simpan info pengguna ke Firestore
+        await db.collection("users").doc(user.uid).set({
+          name,
+          email,
+          role: "pembeli", // default untuk pembeli
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Akun berhasil dibuat!");
+        window.location.href = "index.html";
+      } catch (error) {
+        errorEl.textContent = "Gagal mendaftar: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

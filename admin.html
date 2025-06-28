@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - MakanYuk</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <h1>📦 Panel Admin - MakanYuk</h1>
+    <button onclick="logout()" class="btn-secondary">Logout</button>
+  </header>
+
+  <main class="admin-content">
+    <h2>Daftar Pesanan Masuk</h2>
+    <div id="orderTable" class="order-table"></div>
+  </main>
+
+  <script>
+    // ✅ Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZvhSeKEvHTAPLm6twBoDcmeUnJpOL6gE",
+      authDomain: "makanyuk-83efd.firebaseapp.com",
+      projectId: "makanyuk-83efd"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(user => {
+      const adminEmails = ["admin1@gmail.com", "admin2@gmail.com"];
+      if (!user || !adminEmails.includes(user.email)) {
+        alert("Akses hanya untuk admin!");
+        window.location.href = "index.html";
+      } else {
+        loadOrders();
+      }
+    });
+
+    function loadOrders() {
+      const container = document.getElementById("orderTable");
+      container.innerHTML = "<p>Memuat data pesanan...</p>";
+
+      db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = "<p>Belum ada pesanan masuk.</p>";
+          return;
+        }
+
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Menu</th>
+                <th>Metode</th>
+                <th>Bukti</th>
+                <th>Waktu</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const items = data.cart.map(item => `🍴 ${item.name}`).join("<br>");
+          const link = data.proof ? `<a href="${data.proof}" target="_blank">Lihat Bukti</a>` : "Tidak Ada";
+          const time = data.createdAt?.toDate().toLocaleString("id-ID") || "-";
+          const status = data.status || "Menunggu";
+
+          html += `
+            <tr>
+              <td>${data.email}</td>
+              <td>${items}</td>
+              <td>${data.method.toUpperCase()}</td>
+              <td>${link}</td>
+              <td>${time}</td>
+              <td>
+                <select onchange="updateStatus('${doc.id}', this.value)">
+                  <option value="Menunggu" ${status === "Menunggu" ? "selected" : ""}>Menunggu</option>
+                  <option value="Diproses" ${status === "Diproses" ? "selected" : ""}>Diproses</option>
+                  <option value="Dikirim" ${status === "Dikirim" ? "selected" : ""}>Dikirim</option>
+                  <option value="Selesai" ${status === "Selesai" ? "selected" : ""}>Selesai</option>
+                </select>
+              </td>
+            </tr>
+          `;
+        });
+
+        html += "</tbody></table>";
+        container.innerHTML = html;
+      });
+    }
+
+    function updateStatus(orderId, newStatus) {
+      db.collection("orders").doc(orderId).update({ status: newStatus })
+        .then(() => {
+          console.log("Status diperbarui");
+        })
+        .catch(err => {
+          alert("Gagal memperbarui status: " + err.message);
+        });
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

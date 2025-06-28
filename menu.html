@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu - MakanYuk</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+</head>
+<body class="menu-page">
+
+  <header class="menu-header">
+    <h1>Selamat Datang di MakanYuk!</h1>
+    <p>Pilih menu favoritmu dan nikmati sekarang juga 🍱</p>
+  </header>
+
+  <section class="menu-container" id="menuList">
+    <!-- Daftar menu di-generate oleh JavaScript -->
+  </section>
+
+  <div class="menu-footer">
+    <button onclick="goToCheckout()" class="btn">Lanjut ke Pembayaran</button>
+    <button onclick="logout()" class="btn-secondary">Logout</button>
+  </div>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZvhSeKEvHTAPLm6twBoDcmeUnJpOL6gE",
+      authDomain: "makanyuk-83efd.firebaseapp.com",
+      projectId: "makanyuk-83efd"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Cek user login
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    // Menu makanan (contoh dummy)
+    const menuItems = [
+      { id: 1, name: "Nasi Goreng", price: 20000, image: "images/nasigoreng.jpg" },
+      { id: 2, name: "Ayam Geprek", price: 22000, image: "images/ayamgeprek.jpg" },
+      { id: 3, name: "Mie Ayam", price: 18000, image: "images/mieayam.jpg" },
+    ];
+
+    const menuList = document.getElementById("menuList");
+
+    menuItems.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "menu-card";
+      card.innerHTML = `
+        <img src="${item.image}" alt="${item.name}" />
+        <h3>${item.name}</h3>
+        <p>Rp ${item.price.toLocaleString()}</p>
+        <button onclick="addToCart(${item.id})">Pesan</button>
+      `;
+      menuList.appendChild(card);
+    });
+
+    // Simpan ke localStorage untuk sementara
+    let cart = [];
+
+    function addToCart(id) {
+      const selected = menuItems.find(item => item.id === id);
+      cart.push(selected);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${selected.name} ditambahkan ke pesanan`);
+    }
+
+    function goToCheckout() {
+      if (cart.length === 0) {
+        alert("Pilih menu dulu ya!");
+        return;
+      }
+      window.location.href = "checkout.html";
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        localStorage.clear();
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

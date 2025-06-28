@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - MakanYuk</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+</head>
+<body class="checkout-page">
+
+  <div class="checkout-container">
+    <h2>Checkout Pesanan</h2>
+    <div id="orderList" class="order-list"></div>
+
+    <h3>Pilih Metode Pembayaran</h3>
+    <select id="paymentMethod" onchange="handlePaymentChange()">
+      <option value="">-- Pilih --</option>
+      <option value="bca">Transfer Bank BCA</option>
+      <option value="bni">Transfer Bank BNI</option>
+      <option value="mandiri">Transfer Bank Mandiri</option>
+      <option value="bri">Transfer Bank BRI</option>
+      <option value="cash">Bayar Cash (DP Minimal Rp 10.000)</option>
+    </select>
+
+    <div id="bankDetails" class="payment-info" style="display: none;"></div>
+    <div id="uploadSection" style="display: none;">
+      <label>Upload Bukti Transfer / Bukti DP:</label>
+      <input type="file" id="proof" />
+    </div>
+
+    <button onclick="submitOrder()" class="btn">Kirim Pesanan</button>
+    <p id="checkoutError" class="error-message"></p>
+  </div>
+
+  <script>
+    // ✅ Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZvhSeKEvHTAPLm6twBoDcmeUnJpOL6gE",
+      authDomain: "makanyuk-83efd.firebaseapp.com",
+      projectId: "makanyuk-83efd",
+      storageBucket: "makanyuk-83efd.appspot.com",
+      appId: "1:855674928287:web:d1a61ac04911c7c1ba76aa"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let userEmail = localStorage.getItem("userEmail");
+
+    const orderList = document.getElementById("orderList");
+    const bankDetails = document.getElementById("bankDetails");
+    const uploadSection = document.getElementById("uploadSection");
+    const paymentSelect = document.getElementById("paymentMethod");
+    const errorEl = document.getElementById("checkoutError");
+
+    // Tampilkan pesanan
+    function displayOrders() {
+      if (cart.length === 0) {
+        orderList.innerHTML = "<p>Tidak ada pesanan.</p>";
+        return;
+      }
+
+      let html = "<ul>";
+      cart.forEach(item => {
+        html += `<li>${item.name} - Rp ${item.price.toLocaleString()}</li>`;
+      });
+      html += "</ul>";
+      orderList.innerHTML = html;
+    }
+
+    displayOrders();
+
+    function handlePaymentChange() {
+      const method = paymentSelect.value;
+      bankDetails.style.display = "none";
+      uploadSection.style.display = "none";
+
+      if (method === "bca") {
+        bankDetails.style.display = "block";
+        bankDetails.innerHTML = "<strong>No. Rekening BCA:</strong> 1234567890 a.n MakanYuk";
+        uploadSection.style.display = "block";
+      } else if (method === "bni") {
+        bankDetails.style.display = "block";
+        bankDetails.innerHTML = "<strong>No. Rekening BNI:</strong> 9876543210 a.n MakanYuk";
+        uploadSection.style.display = "block";
+      } else if (method === "mandiri") {
+        bankDetails.style.display = "block";
+        bankDetails.innerHTML = "<strong>No. Rekening Mandiri:</strong> 1122334455 a.n MakanYuk";
+        uploadSection.style.display = "block";
+      } else if (method === "bri") {
+        bankDetails.style.display = "block";
+        bankDetails.innerHTML = "<strong>No. Rekening BRI:</strong> 5566778899 a.n MakanYuk";
+        uploadSection.style.display = "block";
+      } else if (method === "cash") {
+        bankDetails.style.display = "block";
+        bankDetails.innerHTML = "<strong>Bayar Cash:</strong> DP minimal Rp 10.000 saat pengantaran";
+        uploadSection.style.display = "block";
+      }
+    }
+
+    async function submitOrder() {
+      const method = paymentSelect.value;
+      const file = document.getElementById("proof").files[0];
+
+      if (!method) {
+        errorEl.textContent = "Silakan pilih metode pembayaran.";
+        return;
+      }
+
+      if (!file) {
+        errorEl.textContent = "Silakan upload bukti pembayaran atau DP.";
+        return;
+      }
+
+      try {
+        // Upload bukti transfer ke Firebase Storage
+        const storageRef = storage.ref(`bukti-transfer/${Date.now()}_${file.name}`);
+        await storageRef.put(file);
+        const fileURL = await storageRef.getDownloadURL();
+
+        // Simpan ke Firestore
+        await db.collection("orders").add({
+          email: userEmail,
+          cart: cart,
+          method: method,
+          proof: fileURL,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Pesanan berhasil dikirim!");
+        localStorage.removeItem("cart");
+        window.location.href = "menu.html";
+      } catch (error) {
+        console.error("Submit error:", error);
+        errorEl.textContent = "Gagal mengirim pesanan. Coba lagi.";
+      }
+    }
+
+    // Cek login
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
