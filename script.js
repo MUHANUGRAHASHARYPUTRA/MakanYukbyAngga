@@ -14,14 +14,21 @@ const firebaseConfig = {
   const auth = firebase.auth();
   const db = firebase.firestore();
   
-  // ✅ Data admin (ganti sesuai kebutuhan)
+  // ✅ Logout dan hapus data lokal saat halaman dimuat
+  firebase.auth().signOut().then(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+  
+  // ✅ Daftar email admin
   const adminAccounts = [
     "admin1@gmail.com",
     "admin2@gmail.com"
   ];
   
-  // ✅ Login Form
+  // ✅ Login dan Register Handler
   document.addEventListener("DOMContentLoaded", () => {
+    // === LOGIN ===
     const loginForm = document.getElementById("loginForm");
     const errorMessage = document.getElementById("error-message");
   
@@ -35,7 +42,6 @@ const firebaseConfig = {
           const userCredential = await auth.signInWithEmailAndPassword(email, password);
           const userEmail = userCredential.user.email;
   
-          // ✅ Simpan ke localStorage
           localStorage.setItem("userEmail", userEmail);
   
           if (adminAccounts.includes(userEmail)) {
@@ -46,8 +52,44 @@ const firebaseConfig = {
   
         } catch (error) {
           console.error("Login error:", error);
-          errorMessage.textContent = "Login gagal: " + error.message;
-      
+          if (errorMessage) {
+            errorMessage.textContent = "Login gagal: " + error.message;
+          } else {
+            alert("Login gagal: " + error.message);
+          }
+        }
+      });
+    }
+  
+    // === REGISTER ===
+    const registerForm = document.getElementById("registerForm");
+    const registerError = document.getElementById("register-error");
+  
+    if (registerForm) {
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("register-email").value.trim();
+        const password = document.getElementById("register-password").value;
+  
+        try {
+          // Logout user aktif dulu kalau ada
+          await auth.signOut();
+  
+          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          const user = userCredential.user;
+  
+          localStorage.setItem("userEmail", user.email);
+  
+          // Redirect ke menu.html (default user biasa)
+          window.location.href = "menu.html";
+  
+        } catch (error) {
+          console.error("Register error:", error); // Tambahan: tampilkan error di console
+          if (registerError) {
+            registerError.textContent = "Gagal daftar: " + error.message + " (" + error.code + ")";
+          } else {
+            alert("Gagal daftar: " + error.message + " (" + error.code + ")");
+          }
         }
       });
     }
